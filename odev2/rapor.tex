@@ -1,0 +1,241 @@
+\documentclass[12pt,a4paper]{article}
+
+% Türkçe ve karakter desteği
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[shorthands=off,turkish]{babel}
+
+% Matematik
+\usepackage{amsmath,amssymb}
+
+% Sayfa düzeni
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+% Görsel
+\usepackage{graphicx}
+\usepackage{float}
+
+% Satır aralığı
+\usepackage{setspace}
+\onehalfspacing
+
+\begin{document}
+
+% =========================
+% KAPAK SAYFASI
+% =========================
+\begin{titlepage}
+    \centering
+    \vspace*{3cm}
+
+    {\Large Ankara Üniversitesi \par}
+    \vspace{0.5cm}
+    {\Large Makine Öğrenmesi Dersi \par}
+    \vspace{2cm}
+
+    {\Huge \textbf{MLE ile Akıllı Şehir Planlaması} \par}
+    \vspace{0.5cm}
+    {\Large Poisson Dağılımı ile Trafik Yoğunluğu Tahmini \par}
+
+    \vfill
+
+    \begin{flushleft}
+    \textbf{Ders Adı:} Makine Öğrenmesi \\
+    \textbf{Öğrenci Adı:} Ahmed Berat ÖZER \\
+    \textbf{Öğrenci Numarası:} 24290524 \\
+    \textbf{Tarih:} 15/03/2026
+    \end{flushleft}
+
+    \vfill
+\end{titlepage}
+
+% =========================
+% BÖLÜM 1
+% =========================
+\section*{Bölüm 1: Teorik Çözümler}
+
+Şehir trafiğinde bir dakikada geçen araç sayısı \(K\) rassal değişkeni ile gösterilsin. Problemde bu değişkenin Poisson dağılımına uyduğu varsayılmaktadır. Bu durumda olasılık kütle fonksiyonu
+
+\[
+P(K=k)=\frac{e^{-\lambda}\lambda^k}{k!}, \qquad k=0,1,2,\dots
+\]
+
+şeklindedir. Burada \(\lambda > 0\) parametresi bir dakikadaki beklenen araç sayısını ifade eder.
+
+Elimizde birbirinden bağımsız \(n\) adet gözlem olduğunu varsayalım:
+
+\[
+\{k_1,k_2,\dots,k_n\}
+\]
+
+Bu veri seti için likelihood (olabilirlik) fonksiyonu
+
+\[
+L(\lambda)=\prod_{i=1}^{n}\frac{e^{-\lambda}\lambda^{k_i}}{k_i!}
+\]
+
+şeklindedir.
+
+Bu ifade düzenlenirse
+
+\[
+L(\lambda)=e^{-n\lambda}\lambda^{\sum_{i=1}^{n}k_i}\prod_{i=1}^{n}\frac{1}{k_i!}
+\]
+
+elde edilir.
+
+Hesaplamayı kolaylaştırmak için doğal logaritma alınır:
+
+\[
+\ell(\lambda)=\log L(\lambda)
+\]
+
+Dolayısıyla log-likelihood fonksiyonu
+
+\[
+\ell(\lambda)
+=
+\log\left(
+e^{-n\lambda}\lambda^{\sum_{i=1}^{n}k_i}\prod_{i=1}^{n}\frac{1}{k_i!}
+\right)
+\]
+
+olur. Logaritma özellikleri kullanılırsa
+
+\[
+\ell(\lambda)= -n\lambda + \left(\sum_{i=1}^{n}k_i\right)\log\lambda - \sum_{i=1}^{n}\log(k_i!)
+\]
+
+bulunur.
+
+MLE tahminini elde etmek için \(\ell(\lambda)\) fonksiyonunun \(\lambda\)'ya göre türevi alınır:
+
+\[
+\frac{d\ell(\lambda)}{d\lambda}
+=
+-n+\frac{\sum_{i=1}^{n}k_i}{\lambda}
+\]
+
+En büyük değeri bulmak için türev sıfıra eşitlenir:
+
+\[
+-n+\frac{\sum_{i=1}^{n}k_i}{\lambda}=0
+\]
+
+Buradan
+
+\[
+\frac{\sum_{i=1}^{n}k_i}{\lambda}=n
+\]
+
+ve son olarak
+
+\[
+\hat{\lambda}=\frac{1}{n}\sum_{i=1}^{n}k_i
+\]
+
+elde edilir.
+
+Bu sonuç, Poisson dağılımı için MLE ile elde edilen parametre tahmininin verilerin aritmetik ortalaması olduğunu göstermektedir.
+
+Verilen trafik verisi
+
+\[
+\{12,15,10,8,14,11,13,16,9,12,11,14,10,15\}
+\]
+
+şeklindedir. Gözlem sayısı
+
+\[
+n=14
+\]
+
+ve toplam
+
+\[
+\sum_{i=1}^{14}k_i = 170
+\]
+
+olduğundan
+
+\[
+\hat{\lambda}=\frac{170}{14}=12.142857
+\]
+
+bulunur. Buna göre en iyi parametre tahmini yaklaşık olarak
+
+\[
+\boxed{\hat{\lambda}\approx 12.14}
+\]
+
+şeklindedir.
+
+% =========================
+% BÖLÜM 2
+% =========================
+\section*{Bölüm 2: Analiz ve Yorumlar}
+
+Python ile negatif log-olabilirlik fonksiyonu minimize edilerek yapılan sayısal çözüm sonucunda elde edilen \(\lambda\) değeri, analitik olarak bulunan örnek ortalaması ile aynı çıkmaktadır. Bu durum, teorik türetmenin doğruluğunu ve kurulan optimizasyon probleminin uygun olduğunu göstermektedir.
+
+Bu veri için hem analitik hem de sayısal sonuç yaklaşık olarak
+
+\[
+\hat{\lambda} \approx 12.14
+\]
+
+değerini vermektedir.
+
+\subsection*{Grafik Yorumu}
+
+Bulunan \(\hat{\lambda}\) değeri kullanılarak çizilen Poisson PMF grafiği ile gerçek veri histogramı karşılaştırıldığında, modelin verinin merkezini makul biçimde temsil ettiği görülmektedir. Gözlemler büyük ölçüde \(10\) ile \(15\) aralığında yoğunlaşmaktadır ve tahmin edilen \(\lambda\) değeri de bu merkezi eğilime karşılık gelmektedir.
+
+Aşağıdaki şekilde Python çıktısı olarak elde edilen grafik yer almaktadır.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{C:/Users/HUAWE/traffic_poisson_fit.png}
+    \caption{Gerçek veri histogramı ile Poisson PMF karşılaştırması}
+\end{figure}
+
+Histogram ile teorik Poisson eğrisi arasındaki genel uyum, modelin veri için ilk yaklaşım olarak uygun olduğunu göstermektedir. Ancak örneklem sayısı sınırlı olduğu için gözlenen frekanslarla teorik dağılım arasında küçük farklar oluşması doğaldır.
+
+\subsection*{Outlier Analizi}
+
+Veri setine yanlışlıkla \(200\) araçlık bir gözlem eklendiği düşünülürse yeni veri seti şu hale gelir:
+
+\[
+\{12,15,10,8,14,11,13,16,9,12,11,14,10,15,200\}
+\]
+
+Bu durumda yeni toplam
+
+\[
+170+200=370
+\]
+
+ve yeni gözlem sayısı
+
+\[
+15
+\]
+
+olacağından yeni MLE tahmini
+
+\[
+\hat{\lambda}_{\text{outlier}}=\frac{370}{15}=24.666667
+\]
+
+olur.
+
+Görüldüğü gibi tek bir aykırı değer, \(\hat{\lambda}\) tahminini yaklaşık \(12.14\)'ten \(24.67\)'ye yükseltmektedir. Bunun nedeni, Poisson dağılımı için MLE tahmininin doğrudan örnek ortalamasına eşit olmasıdır. Ortalama ise aykırı gözlemlere oldukça duyarlıdır.
+
+Bu durum belediyenin trafik planlamasında ciddi hatalara yol açabilir. Örneğin sistem yolun gerçek yoğunluğunu olduğundan çok daha yüksek tahmin edebilir. Bunun sonucunda gereksiz yol genişletme kararları alınabilir, bütçe yanlış alanlara yönlendirilebilir ve trafik yönetiminde hatalı planlama yapılabilir. Bu nedenle gerçek uygulamalarda veri temizliği yapılması ve aykırı gözlemlerin kontrol edilmesi büyük önem taşır.
+
+% =========================
+% KAYNAKÇA
+% =========================
+\section*{Kaynakça}
+
+Bu rapor hazırlanırken ödev yönergesi dışında harici bir kaynak kullanılmamıştır.
+
+\end{document}
