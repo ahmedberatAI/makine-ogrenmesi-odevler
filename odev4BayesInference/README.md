@@ -1,4 +1,3 @@
-
 # Bayesian Brightness Analysis
 
 ## Proje başlığı
